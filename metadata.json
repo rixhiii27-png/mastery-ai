@@ -1,0 +1,6 @@
+{
+  "name": "MASTERY AI",
+  "description": "An AI tutor that learns how you learn. Adaptive CBSE Classes 10-12 learning platform with Living Learner Model, Gemini 4 Hydrogen tutoring, diagnostic assessments, and Student, Teacher, and Parent portals.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

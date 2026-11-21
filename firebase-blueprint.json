@@ -1,0 +1,367 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Authenticated user profile stored at users/{uid}. Roles cannot be self-elevated from student.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "email": { "type": "string", "format": "email", "maxLength": 254 },
+        "role": { "type": "string", "enum": ["student", "teacher", "parent"] },
+        "classLevel": { "type": "string", "enum": ["10", "11", "12"] },
+        "selectedSubjects": { "type": "array", "maxLength": 10 },
+        "dailyGoalMinutes": { "type": "integer" },
+        "streakDays": { "type": "integer" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "displayName", "email", "role", "classLevel", "selectedSubjects", "dailyGoalMinutes", "createdAt", "updatedAt"]
+    },
+    "CurriculumChapter": {
+      "title": "CurriculumChapter",
+      "description": "Versioned CBSE curriculum chapter record stored at curriculum/{chapterId}.",
+      "type": "object",
+      "properties": {
+        "chapterId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "classLevel": { "type": "string", "enum": ["10", "11", "12"] },
+        "subject": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "chapterNumber": { "type": "integer" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "academicSession": { "type": "string", "minLength": 4, "maxLength": 20 },
+        "curriculumVersion": { "type": "string", "minLength": 1, "maxLength": 32 },
+        "source": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "verificationStatus": { "type": "string", "enum": ["demo_seed", "verified_syllabus", "pending_review"] },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["chapterId", "classLevel", "subject", "chapterNumber", "title", "academicSession", "curriculumVersion", "source", "verificationStatus", "updatedAt"]
+    },
+    "LearnerConcept": {
+      "title": "LearnerConcept",
+      "description": "Concept-level Living Learner Model state stored at learnerModels/{uid}/concepts/{conceptId}.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "conceptId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "conceptName": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "chapterId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "subject": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "classLevel": { "type": "string", "enum": ["10", "11", "12"] },
+        "masteryScore": { "type": "number" },
+        "attempts": { "type": "integer" },
+        "correctAnswers": { "type": "integer" },
+        "incorrectAnswers": { "type": "integer" },
+        "latestAssessmentResult": { "type": "number" },
+        "difficultyLevel": { "type": "string", "enum": ["foundational", "standard", "application", "challenge"] },
+        "lastPracticeDate": { "type": "string", "maxLength": 40 },
+        "nextRevisionDate": { "type": "string", "maxLength": 40 },
+        "evidenceCount": { "type": "integer" },
+        "potentialMisconception": { "type": "string", "maxLength": 500 },
+        "misconceptionConfidence": { "type": "number" },
+        "learningStatus": { "type": "string", "enum": ["not_started", "needs_attention", "developing", "proficient", "mastered"] },
+        "lastProcessedAssessmentId": { "type": "string", "maxLength": 128 },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "conceptId", "conceptName", "chapterId", "subject", "classLevel", "masteryScore", "attempts", "correctAnswers", "incorrectAnswers", "latestAssessmentResult", "difficultyLevel", "lastPracticeDate", "nextRevisionDate", "evidenceCount", "potentialMisconception", "misconceptionConfidence", "learningStatus", "updatedAt"]
+    },
+    "AttemptRecord": {
+      "title": "AttemptRecord",
+      "description": "Immutable question attempt record stored at attempts/{attemptId}.",
+      "type": "object",
+      "properties": {
+        "attemptId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "assessmentId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "conceptId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "questionId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "selectedOptionIndex": { "type": "integer" },
+        "isCorrect": { "type": "boolean" },
+        "difficultyLevel": { "type": "string", "enum": ["foundational", "standard", "application", "challenge"] },
+        "timeSpentSeconds": { "type": "integer" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["attemptId", "uid", "assessmentId", "conceptId", "questionId", "selectedOptionIndex", "isCorrect", "difficultyLevel", "timeSpentSeconds", "createdAt"]
+    },
+    "AssessmentRecord": {
+      "title": "AssessmentRecord",
+      "description": "Completed diagnostic, adaptive practice, or exam record stored at assessments/{assessmentId}. Terminal once completed.",
+      "type": "object",
+      "properties": {
+        "assessmentId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "type": { "type": "string", "enum": ["diagnostic", "practice", "exam"] },
+        "classLevel": { "type": "string", "enum": ["10", "11", "12"] },
+        "subject": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "chapterId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "scorePercent": { "type": "number" },
+        "totalQuestions": { "type": "integer" },
+        "correctCount": { "type": "integer" },
+        "status": { "type": "string", "enum": ["in_progress", "completed"] },
+        "curriculumVersion": { "type": "string", "minLength": 1, "maxLength": 32 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "completedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["assessmentId", "uid", "type", "classLevel", "subject", "chapterId", "scorePercent", "totalQuestions", "correctCount", "status", "curriculumVersion", "createdAt"]
+    },
+    "StudyPlan": {
+      "title": "StudyPlan",
+      "description": "Student learning plan stored at studyPlans/{planId}.",
+      "type": "object",
+      "properties": {
+        "planId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "weeklyTargetHours": { "type": "number" },
+        "dailyTargetQuestions": { "type": "integer" },
+        "priorityConcepts": { "type": "array", "maxLength": 12 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["planId", "uid", "title", "weeklyTargetHours", "dailyTargetQuestions", "priorityConcepts", "createdAt", "updatedAt"]
+    },
+    "RevisionItem": {
+      "title": "RevisionItem",
+      "description": "Deterministic spaced-repetition revision item at revisionSchedules/{uid}/items/{itemId}.",
+      "type": "object",
+      "properties": {
+        "itemId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "conceptId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "conceptName": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "subject": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "chapterId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "dueDate": { "type": "string", "minLength": 8, "maxLength": 40 },
+        "intervalDays": { "type": "integer" },
+        "repetitionStage": { "type": "integer" },
+        "priority": { "type": "string", "enum": ["high", "medium", "low"] },
+        "status": { "type": "string", "enum": ["pending", "completed"] },
+        "reason": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["itemId", "uid", "conceptId", "conceptName", "subject", "chapterId", "dueDate", "intervalDays", "repetitionStage", "priority", "status", "reason", "createdAt", "updatedAt"]
+    },
+    "SavedMaterial": {
+      "title": "SavedMaterial",
+      "description": "Saved AI tutor explanation or generated study material at savedMaterials/{uid}/items/{itemId}.",
+      "type": "object",
+      "properties": {
+        "itemId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "materialType": { "type": "string", "enum": ["tutor_note", "chapter_notes", "summary", "revision_notes", "flashcards", "formula_sheet", "practice_questions", "concept_list"] },
+        "classLevel": { "type": "string", "enum": ["10", "11", "12"] },
+        "subject": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "chapterId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "content": { "type": "string", "minLength": 1, "maxLength": 25000 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["itemId", "uid", "title", "materialType", "classLevel", "subject", "chapterId", "content", "createdAt"]
+    },
+    "Classroom": {
+      "title": "Classroom",
+      "description": "Authorized teacher classroom aggregate stored at classes/{classId}.",
+      "type": "object",
+      "properties": {
+        "classId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "teacherUid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "classLevel": { "type": "string", "enum": ["10", "11", "12"] },
+        "subject": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["classId", "teacherUid", "name", "classLevel", "subject", "createdAt"]
+    },
+    "ParentLink": {
+      "title": "ParentLink",
+      "description": "Verified parent-to-student permission link stored at parentLinks/{linkId}.",
+      "type": "object",
+      "properties": {
+        "linkId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "parentUid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "studentUid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "status": { "type": "string", "enum": ["pending", "verified", "revoked"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["linkId", "parentUid", "studentUid", "status", "createdAt", "updatedAt"]
+    },
+    "CurriculumSession": {
+      "title": "CurriculumSession",
+      "description": "Academic session metadata stored at curriculumSessions/{sessionId}.",
+      "type": "object",
+      "properties": {
+        "sessionId": { "type": "string", "minLength": 4, "maxLength": 20 },
+        "label": { "type": "string", "minLength": 3, "maxLength": 120 },
+        "board": { "type": "string", "enum": ["CBSE"] },
+        "isActive": { "type": "boolean" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["sessionId", "label", "board", "isActive", "updatedAt"]
+    },
+    "CurriculumSubject": {
+      "title": "CurriculumSubject",
+      "description": "Official CBSE 2026-27 subject metadata stored at curriculumSubjects/{subjectId}.",
+      "type": "object",
+      "properties": {
+        "subjectId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "academicSession": { "type": "string", "minLength": 4, "maxLength": 20 },
+        "classLevel": { "type": "string", "enum": ["10", "11", "12"] },
+        "name": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "subjectCode": { "type": "string", "maxLength": 20 },
+        "category": { "type": "string", "enum": ["main_academic", "language", "academic_elective", "skill_education"] },
+        "sourceUrl": { "type": "string", "minLength": 10, "maxLength": 500 },
+        "verificationStatus": { "type": "string", "enum": ["Verified", "Pending Verification", "Incomplete", "Source Unavailable", "Superseded"] },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["subjectId", "academicSession", "classLevel", "name", "category", "sourceUrl", "verificationStatus", "updatedAt"]
+    },
+    "CurriculumUnitChapter": {
+      "title": "CurriculumUnitChapter",
+      "description": "Structured CBSE chapter/unit metadata stored at curriculumChapters/{chapterId}.",
+      "type": "object",
+      "properties": {
+        "chapterId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "subjectId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "academicSession": { "type": "string", "minLength": 4, "maxLength": 20 },
+        "classLevel": { "type": "string", "enum": ["10", "11", "12"] },
+        "subject": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "unitName": { "type": "string", "minLength": 1, "maxLength": 180 },
+        "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "verificationStatus": { "type": "string", "enum": ["Verified", "Pending Verification", "Incomplete", "Source Unavailable", "Superseded"] },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["chapterId", "subjectId", "academicSession", "classLevel", "subject", "unitName", "title", "verificationStatus", "updatedAt"]
+    },
+    "CurriculumLesson": {
+      "title": "CurriculumLesson",
+      "description": "Structured CBSE lesson metadata stored at curriculumLessons/{lessonId}.",
+      "type": "object",
+      "properties": {
+        "lessonId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "academicSession": { "type": "string", "minLength": 4, "maxLength": 20 },
+        "classLevel": { "type": "string", "enum": ["10", "11", "12"] },
+        "subjectId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "chapterId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "lessonNumber": { "type": "integer" },
+        "lessonTitle": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "lessonType": { "type": "string", "enum": ["theory", "numerical", "practical", "literature", "grammar", "historical", "case_study", "skill_based", "project_based"] },
+        "verificationStatus": { "type": "string", "enum": ["Verified", "Pending Verification", "Incomplete", "Source Unavailable", "Superseded"] },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["lessonId", "academicSession", "classLevel", "subjectId", "chapterId", "lessonNumber", "lessonTitle", "lessonType", "verificationStatus", "updatedAt"]
+    },
+    "CurriculumConcept": {
+      "title": "CurriculumConcept",
+      "description": "Granular concept node stored at curriculumConcepts/{conceptId}.",
+      "type": "object",
+      "properties": {
+        "conceptId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "lessonId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "chapterId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "name": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["conceptId", "lessonId", "chapterId", "name", "updatedAt"]
+    },
+    "CurriculumImportJob": {
+      "title": "CurriculumImportJob",
+      "description": "Audit log of syllabus ingestion batches stored at curriculumImports/{importId}.",
+      "type": "object",
+      "properties": {
+        "importId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "academicSession": { "type": "string", "minLength": 4, "maxLength": 20 },
+        "format": { "type": "string", "enum": ["json", "csv"] },
+        "sourceLabel": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "status": { "type": "string", "enum": ["completed", "partial_with_errors", "failed"] },
+        "insertedCount": { "type": "integer" },
+        "failedCount": { "type": "integer" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["importId", "academicSession", "format", "sourceLabel", "status", "insertedCount", "failedCount", "createdAt"]
+    },
+    "LessonContent": {
+      "title": "LessonContent",
+      "description": "Cached AI-generated original lesson explanation stored at lessonContent/{lessonId}.",
+      "type": "object",
+      "properties": {
+        "lessonId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "contentOrigin": { "type": "string", "enum": ["ai_generated_original"] },
+        "payloadJson": { "type": "string", "minLength": 10, "maxLength": 80000 },
+        "modelUsed": { "type": "string", "minLength": 2, "maxLength": 64 },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["lessonId", "contentOrigin", "payloadJson", "modelUsed", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{uid}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Authenticated user profile with PII isolation (owner or admin only)."
+    },
+    "/curriculum/{chapterId}": {
+      "schema": { "$ref": "#/entities/CurriculumChapter" },
+      "description": "Read-only versioned CBSE curriculum records; admin-managed writes."
+    },
+    "/curriculumSessions/{sessionId}": {
+      "schema": { "$ref": "#/entities/CurriculumSession" },
+      "description": "CBSE academic session registry; read-only for signed-in users, admin-managed writes."
+    },
+    "/curriculumSubjects/{subjectId}": {
+      "schema": { "$ref": "#/entities/CurriculumSubject" },
+      "description": "Official CBSE 2026-27 subjects across Classes 10, 11, 12 and Skill Education."
+    },
+    "/curriculumChapters/{chapterId}": {
+      "schema": { "$ref": "#/entities/CurriculumUnitChapter" },
+      "description": "Structured CBSE chapters/units linked to official subjects."
+    },
+    "/curriculumLessons/{lessonId}": {
+      "schema": { "$ref": "#/entities/CurriculumLesson" },
+      "description": "Structured CBSE lessons with lesson types, topics, concepts, and learning objectives."
+    },
+    "/curriculumConcepts/{conceptId}": {
+      "schema": { "$ref": "#/entities/CurriculumConcept" },
+      "description": "Granular curriculum concepts linked to lessons and chapters."
+    },
+    "/curriculumImports/{importId}": {
+      "schema": { "$ref": "#/entities/CurriculumImportJob" },
+      "description": "Admin-only curriculum import audit logs and failed-record reports."
+    },
+    "/lessonContent/{lessonId}": {
+      "schema": { "$ref": "#/entities/LessonContent" },
+      "description": "Cached AI-generated original lesson content; readable by signed-in users, admin-managed writes."
+    },
+    "/learnerModels/{uid}/concepts/{conceptId}": {
+      "schema": { "$ref": "#/entities/LearnerConcept" },
+      "description": "Student Living Learner Model concept mastery records."
+    },
+    "/attempts/{attemptId}": {
+      "schema": { "$ref": "#/entities/AttemptRecord" },
+      "description": "Immutable individual question attempt records owned by student uid."
+    },
+    "/assessments/{assessmentId}": {
+      "schema": { "$ref": "#/entities/AssessmentRecord" },
+      "description": "Diagnostic, adaptive practice, and exam assessment records owned by student uid."
+    },
+    "/studyPlans/{planId}": {
+      "schema": { "$ref": "#/entities/StudyPlan" },
+      "description": "Student study plans owned by student uid."
+    },
+    "/revisionSchedules/{uid}/items/{itemId}": {
+      "schema": { "$ref": "#/entities/RevisionItem" },
+      "description": "Spaced-repetition revision tasks owned by student uid."
+    },
+    "/savedMaterials/{uid}/items/{itemId}": {
+      "schema": { "$ref": "#/entities/SavedMaterial" },
+      "description": "Saved tutor notes and AI study materials owned by student uid."
+    },
+    "/classes/{classId}": {
+      "schema": { "$ref": "#/entities/Classroom" },
+      "description": "Teacher-owned classroom metadata; restricted to assigned teacherUid or admin."
+    },
+    "/parentLinks/{linkId}": {
+      "schema": { "$ref": "#/entities/ParentLink" },
+      "description": "Verified parent-student access links; only verified links grant summary read rights."
+    }
+  }
+}
